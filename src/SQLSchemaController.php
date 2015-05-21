@@ -92,6 +92,22 @@ abstract class SQLSchemaController {
 		return $indexes;
 	}
 
+	/**
+	 * This function is used to grab an array of column names that make up the primary key
+	 *
+	 * @param string $table The table you wish to retrieve the primary index columns for
+	 * @return array An array of column names the create the primary key
+	 */
+	public function showPrimaryIndex($table) {
+		return DB::with('information_schema.statistics', $this->db)
+			->select('column_name')
+			->where([
+				'table_schema' => $this->db_config['database'],
+				'table_name' => $table,
+				'index_name' => 'PRIMARY',
+			])->values();
+	}
+
 	abstract public function addIndexes($table, array $indexes, array $options = []);
 
 	abstract public function addIndex($table, $name, $type, array $columns, $unique = false, array $options = []);

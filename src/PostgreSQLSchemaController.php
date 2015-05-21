@@ -103,6 +103,23 @@ class PostgreSQLSchemaController extends SQLSchemaController {
 		return $indexes;
 	}
 
+	/**
+	 * This function is used to grab an array of column names that make up the primary key
+	 *
+	 * @param string $table The table you wish to retrieve the primary index columns for
+	 * @return array An array of column names the create the primary key
+	 */
+	public function showPrimaryIndex($table) {
+		$query = DB::with('');
+		$table = $query->escapeKeyword($table);
+		return $query->query("
+			SELECT a.attname
+			FROM   pg_index i
+			JOIN   pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+			WHERE  i.indrelid = '$table'::regclass AND i.indisprimary;
+		")->values();
+	}
+
 	public function addIndexes($table, array $indexes, array $options = []) {
 		if (empty($indexes)) {
 			throw new Exception('No indexes provided');
